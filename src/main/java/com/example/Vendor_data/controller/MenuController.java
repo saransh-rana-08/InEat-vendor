@@ -32,7 +32,7 @@ public class MenuController {
         return menuService.createMenu(vendorId, menu);
     }
 
-    // Update menu item (PATCH)
+    // Update menu item
     @PatchMapping("/{menuId}")
     public Menu updateMenu(@PathVariable Long vendorId, @PathVariable Long menuId,
                            @RequestBody Menu menu) {

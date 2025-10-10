@@ -13,8 +13,6 @@ public class Menu {
     private String itemName;
     private Double price;
 
-    private Integer quantity;  // <-- new field
-
     @ManyToOne
     @JoinColumn(name = "vendor_id")
     private Vendor vendor;
@@ -22,10 +20,9 @@ public class Menu {
     // Constructors
     public Menu() {}
 
-    public Menu(String itemName, Double price, Integer quantity, Vendor vendor) {
+    public Menu(String itemName, Double price, Vendor vendor) {
         this.itemName = itemName;
         this.price = price;
-        this.quantity = quantity;
         this.vendor = vendor;
     }
 
@@ -38,9 +35,6 @@ public class Menu {
 
     public Double getPrice() { return price; }
     public void setPrice(Double price) { this.price = price; }
-
-    public Integer getQuantity() { return quantity; }
-    public void setQuantity(Integer quantity) { this.quantity = quantity; }
 
     public Vendor getVendor() { return vendor; }
     public void setVendor(Vendor vendor) { this.vendor = vendor; }

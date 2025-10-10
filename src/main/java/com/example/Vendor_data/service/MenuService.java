@@ -45,11 +45,8 @@ public class MenuService {
     // Update a menu for a vendor
     public Menu updateMenu(Long vendorId, Long menuId, Menu menuDetails) {
         Menu menu = getMenuById(vendorId, menuId);
-
         if (menuDetails.getItemName() != null) menu.setItemName(menuDetails.getItemName());
         if (menuDetails.getPrice() != null) menu.setPrice(menuDetails.getPrice());
-        if (menuDetails.getQuantity() != null) menu.setQuantity(menuDetails.getQuantity());  // <-- update quantity
-
         return menuRepository.save(menu);
     }
 
