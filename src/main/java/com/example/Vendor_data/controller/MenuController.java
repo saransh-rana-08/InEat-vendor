@@ -1,5 +1,6 @@
 package com.example.Vendor_data.controller;
 
+import com.example.Vendor_data.dto.MenuDTO;
 import com.example.Vendor_data.model.Menu;
 import com.example.Vendor_data.service.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,29 +15,29 @@ public class MenuController {
     @Autowired
     private MenuService menuService;
 
-    // Get all menus for a vendor
+    // Get all menus for a vendor - returns DTOs with vendor name and availability
     @GetMapping
-    public List<Menu> getMenusByVendor(@PathVariable Long vendorId) {
-        return menuService.getMenusByVendor(vendorId);
+    public List<MenuDTO> getMenusByVendor(@PathVariable Long vendorId) {
+        return menuService.getMenuDTOsByVendor(vendorId);
     }
 
-    // Get specific menu item for a vendor
+    // Get specific menu item for a vendor - returns DTO with vendor name and availability
     @GetMapping("/{menuId}")
-    public Menu getMenuById(@PathVariable Long vendorId, @PathVariable Long menuId) {
-        return menuService.getMenuById(vendorId, menuId);
+    public MenuDTO getMenuById(@PathVariable Long vendorId, @PathVariable Long menuId) {
+        return menuService.getMenuDTOById(vendorId, menuId);
     }
 
-    // Create new menu item for a vendor
+    // Create new menu item for a vendor - returns DTO with vendor name and availability
     @PostMapping
-    public Menu createMenu(@PathVariable Long vendorId, @RequestBody Menu menu) {
-        return menuService.createMenu(vendorId, menu);
+    public MenuDTO createMenu(@PathVariable Long vendorId, @RequestBody Menu menu) {
+        return menuService.createMenuDTO(vendorId, menu);
     }
 
-    // Update menu item
+    // Update menu item - returns DTO with vendor name and availability
     @PatchMapping("/{menuId}")
-    public Menu updateMenu(@PathVariable Long vendorId, @PathVariable Long menuId,
-                           @RequestBody Menu menu) {
-        return menuService.updateMenu(vendorId, menuId, menu);
+    public MenuDTO updateMenu(@PathVariable Long vendorId, @PathVariable Long menuId,
+                              @RequestBody Menu menu) {
+        return menuService.updateMenuDTO(vendorId, menuId, menu);
     }
 
     // Delete menu item
