@@ -14,7 +14,6 @@ public class Cart {
     private Long itemId;
     private String name;
     private int quantity;
-
     private Long vendorId;
     private String vendorName;
 
@@ -29,7 +28,7 @@ public class Cart {
         this.vendorName = vendorName;
     }
 
-    // Getters and Setters
+    // Getters & Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

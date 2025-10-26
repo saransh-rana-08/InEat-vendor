@@ -1,64 +1,58 @@
 package com.example.Vendor_data.service;
 
-import com.example.Vendor_data.dto.CartDTO;
 import com.example.Vendor_data.model.Cart;
 import com.example.Vendor_data.repository.CartRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CartService {
 
-    @Autowired
-    private CartRepository cartRepository;
+    private final CartRepository cartRepository;
 
-    // Add item to cart using DTO
-    public void addToCart(CartDTO dto) {
-        List<Cart> existingCart = cartRepository.findByUserId(dto.getUserId());
+    public CartService(CartRepository cartRepository) {
+        this.cartRepository = cartRepository;
+    }
 
-        // Clear previous vendor items if vendor changed
-        if (!existingCart.isEmpty()) {
-            Long existingVendorId = existingCart.get(0).getVendorId();
-            if (!existingVendorId.equals(dto.getVendorId())) {
-                cartRepository.deleteByUserId(dto.getUserId());
-            }
+    @Transactional
+    public Cart addToCart(Cart cart) {
+        List<Cart> existingCartItems = cartRepository.findByUserId(cart.getUserId());
+
+        // Remove all items if vendor changes
+        if (!existingCartItems.isEmpty() &&
+                existingCartItems.stream().anyMatch(c -> !c.getVendorId().equals(cart.getVendorId()))) {
+            cartRepository.deleteByUserId(cart.getUserId());
         }
 
-        Cart cart = new Cart(
-                dto.getUserId(),
-                dto.getItemId(),
-                dto.getName(),
-                dto.getQuantity(),
-                dto.getVendorId(),
-                dto.getVendorName()
-        );
+        // Check if same item already exists
+        Cart existingItem = cartRepository.findByUserIdAndItemId(cart.getUserId(), cart.getItemId());
 
-        cartRepository.save(cart);
+        if (existingItem != null) {
+            // ✅ Increase quantity if same item
+            existingItem.setQuantity(existingItem.getQuantity() + cart.getQuantity());
+            return cartRepository.save(existingItem);
+        } else {
+            // ✅ Add new item
+            return cartRepository.save(cart);
+        }
     }
 
-    // Get cart items and return as DTO
-    public List<CartDTO> getCartByUserId(Long userId) {
-        return cartRepository.findByUserId(userId)
-                .stream()
-                .map(c -> new CartDTO(
-                        c.getUserId(),
-                        c.getItemId(),
-                        c.getName(),
-                        c.getQuantity(),
-                        c.getVendorId(),
-                        c.getVendorName()))
-                .collect(Collectors.toList());
+    public List<Cart> getCartByUserId(Long userId) {
+        return cartRepository.findByUserId(userId);
     }
 
-    // Clear all cart items
-    public void clearCart(Long userId) {
+    @Transactional
+    public void clearCartByUserId(Long userId) {
         cartRepository.deleteByUserId(userId);
     }
 
-    // Delete single item
-    public void deleteItem(Long userId, Long itemId) {
-        cartRepository.deleteItemFromCart(userId, itemId);
+    @Transactional
+    public void deleteCartItem(Long userId, Long itemId) {
+        Cart cart = cartRepository.findByUserIdAndItemId(userId, itemId);
+        if (cart != null) {
+            cartRepository.delete(cart);
+        }
     }
 }

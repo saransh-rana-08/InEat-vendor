@@ -1,6 +1,7 @@
 package com.example.Vendor_data.dto;
 
 public class CartDTO {
+
     private Long userId;
     private Long itemId;
     private String name;
@@ -19,7 +20,7 @@ public class CartDTO {
         this.vendorName = vendorName;
     }
 
-    // Getters and Setters
+    // Getters & Setters
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
 

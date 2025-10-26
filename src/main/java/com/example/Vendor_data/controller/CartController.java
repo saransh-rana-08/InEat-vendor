@@ -1,44 +1,53 @@
 package com.example.Vendor_data.controller;
 
 import com.example.Vendor_data.dto.CartDTO;
+import com.example.Vendor_data.model.Cart;
 import com.example.Vendor_data.service.CartService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/cart")
-@CrossOrigin("*")
 public class CartController {
 
-    @Autowired
-    private CartService cartService;
+    private final CartService cartService;
 
-    // Add to cart
+    public CartController(CartService cartService) {
+        this.cartService = cartService;
+    }
+
+    // ✅ Add item to cart
     @PostMapping("/add")
-    public ResponseEntity<String> addToCart(@RequestBody CartDTO cartDTO) {
-        cartService.addToCart(cartDTO);
-        return ResponseEntity.ok("Item added to cart successfully!");
+    public Cart addToCart(@RequestBody CartDTO cartDTO) {
+        Cart cart = new Cart(
+                cartDTO.getUserId(),
+                cartDTO.getItemId(),
+                cartDTO.getName(),
+                cartDTO.getQuantity(),
+                cartDTO.getVendorId(),
+                cartDTO.getVendorName()
+        );
+        return cartService.addToCart(cart);
     }
 
-    // Get all items for user
+    // ✅ Get cart items by user
     @GetMapping("/{userId}")
-    public ResponseEntity<List<CartDTO>> getCart(@PathVariable Long userId) {
-        return ResponseEntity.ok(cartService.getCartByUserId(userId));
+    public List<Cart> getCart(@PathVariable Long userId) {
+        return cartService.getCartByUserId(userId);
     }
 
-    // Clear full cart for user
-    @DeleteMapping("/clear/{userId}")
-    public ResponseEntity<String> clearCart(@PathVariable Long userId) {
-        cartService.clearCart(userId);
-        return ResponseEntity.ok("Cart cleared successfully for userId: " + userId);
-    }
-
-    // Delete single item from cart
+    // ✅ Delete a specific item
     @DeleteMapping("/{userId}/item/{itemId}")
-    public ResponseEntity<String> deleteItem(@PathVariable Long userId, @PathVariable Long itemId) {
-        cartService.deleteItem(userId, itemId);
-        return ResponseEntity.ok("Item removed successfully from cart for userId: " + userId);
+    public String deleteCartItem(@PathVariable Long userId, @PathVariable Long itemId) {
+        cartService.deleteCartItem(userId, itemId);
+        return "Item deleted successfully!";
+    }
+
+    // ✅ Clear all items for a user
+    @DeleteMapping("/clear/{userId}")
+    public String clearCart(@PathVariable Long userId) {
+        cartService.clearCartByUserId(userId);
+        return "Cart cleared successfully!";
     }
 }
