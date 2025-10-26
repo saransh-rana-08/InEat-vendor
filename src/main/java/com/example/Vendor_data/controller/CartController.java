@@ -17,7 +17,7 @@ public class CartController {
         this.cartService = cartService;
     }
 
-    // ✅ Add item to cart
+    // ✅ Add, update, or delete (if quantity = 0)
     @PostMapping("/add")
     public Cart addToCart(@RequestBody CartDTO cartDTO) {
         Cart cart = new Cart(
@@ -31,9 +31,9 @@ public class CartController {
         return cartService.addToCart(cart);
     }
 
-    // ✅ Get cart items by user
+    // ✅ Get all cart items by user
     @GetMapping("/{userId}")
-    public List<Cart> getCart(@PathVariable Long userId) {
+    public List<Cart> getCartByUserId(@PathVariable Long userId) {
         return cartService.getCartByUserId(userId);
     }
 
@@ -41,10 +41,10 @@ public class CartController {
     @DeleteMapping("/{userId}/item/{itemId}")
     public String deleteCartItem(@PathVariable Long userId, @PathVariable Long itemId) {
         cartService.deleteCartItem(userId, itemId);
-        return "Item deleted successfully!";
+        return "Item removed successfully!";
     }
 
-    // ✅ Clear all items for a user
+    // ✅ Clear entire cart for a user
     @DeleteMapping("/clear/{userId}")
     public String clearCart(@PathVariable Long userId) {
         cartService.clearCartByUserId(userId);

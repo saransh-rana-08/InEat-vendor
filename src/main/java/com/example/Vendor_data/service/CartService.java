@@ -18,25 +18,33 @@ public class CartService {
 
     @Transactional
     public Cart addToCart(Cart cart) {
-        List<Cart> existingCartItems = cartRepository.findByUserId(cart.getUserId());
+        List<Cart> existingItems = cartRepository.findByUserId(cart.getUserId());
 
-        // Remove all items if vendor changes
-        if (!existingCartItems.isEmpty() &&
-                existingCartItems.stream().anyMatch(c -> !c.getVendorId().equals(cart.getVendorId()))) {
+        // ✅ Clear previous vendor's cart if different vendor
+        if (!existingItems.isEmpty() &&
+                existingItems.stream().anyMatch(c -> !c.getVendorId().equals(cart.getVendorId()))) {
             cartRepository.deleteByUserId(cart.getUserId());
         }
 
-        // Check if same item already exists
+        // ✅ Find if this item already exists
         Cart existingItem = cartRepository.findByUserIdAndItemId(cart.getUserId(), cart.getItemId());
 
         if (existingItem != null) {
-            // ✅ Increase quantity if same item
-            existingItem.setQuantity(existingItem.getQuantity() + cart.getQuantity());
+            if (cart.getQuantity() <= 0) {
+                // If quantity = 0 → delete the item
+                cartRepository.delete(existingItem);
+                return null;
+            }
+            // Update quantity
+            existingItem.setQuantity(cart.getQuantity());
             return cartRepository.save(existingItem);
         } else {
-            // ✅ Add new item
-            return cartRepository.save(cart);
+            // Insert new item if not found and quantity > 0
+            if (cart.getQuantity() > 0) {
+                return cartRepository.save(cart);
+            }
         }
+        return null;
     }
 
     public List<Cart> getCartByUserId(Long userId) {
