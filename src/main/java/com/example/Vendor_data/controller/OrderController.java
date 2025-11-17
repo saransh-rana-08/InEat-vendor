@@ -1,47 +1,50 @@
 package com.example.Vendor_data.controller;
 
-import com.example.Vendor_data.model.Order;
+import com.example.Vendor_data.dto.OrderDTO;
 import com.example.Vendor_data.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/vendors/{vendorId}/orders")
+@RequestMapping("/orders")
 public class OrderController {
 
     @Autowired
     private OrderService orderService;
 
-    // Get all orders for vendor
-    @GetMapping
-    public List<Order> getOrdersByVendor(@PathVariable Long vendorId) {
-        return orderService.getOrdersByVendor(vendorId);
-    }
-
-    // Get single order
-    @GetMapping("/{orderId}")
-    public Order getOrderById(@PathVariable Long vendorId, @PathVariable Long orderId) {
-        return orderService.getOrderById(vendorId, orderId);
-    }
-
-    // Create new order
+    // POST
     @PostMapping
-    public Order createOrder(@PathVariable Long vendorId, @RequestBody Order order) {
-        return orderService.createOrder(vendorId, order);
+    public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO dto) {
+        return ResponseEntity.ok(orderService.createOrder(dto));
     }
 
-    // Update order
-    @PatchMapping("/{orderId}")
-    public Order updateOrder(@PathVariable Long vendorId, @PathVariable Long orderId,
-                             @RequestBody Order updatedOrder) {
-        return orderService.updateOrder(vendorId, orderId, updatedOrder);
+    // GET by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<OrderDTO> getOrder(@PathVariable Long id) {
+        return ResponseEntity.ok(orderService.getOrder(id));
     }
 
-    // Delete order
-    @DeleteMapping("/{orderId}")
-    public void deleteOrder(@PathVariable Long vendorId, @PathVariable Long orderId) {
-        orderService.deleteOrder(vendorId, orderId);
+    // GET all by customer
+    @GetMapping("/customer/{customerId}")
+    public ResponseEntity<List<OrderDTO>> getOrdersByCustomer(@PathVariable Long customerId) {
+        return ResponseEntity.ok(orderService.getOrdersByCustomerId(customerId));
+    }
+
+    // PUT update
+    @PutMapping("/{id}")
+    public ResponseEntity<OrderDTO> updateOrder(
+            @PathVariable Long id,
+            @RequestBody OrderDTO dto
+    ) {
+        return ResponseEntity.ok(orderService.updateOrder(id, dto));
+    }
+
+    // DELETE
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteOrder(@PathVariable Long id) {
+        return ResponseEntity.ok(orderService.deleteOrder(id));
     }
 }

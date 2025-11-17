@@ -10,30 +10,54 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "customer_id")
+    private Long customerId;
+
+    @Column(name = "customer_name")
+    private String customerName;
+
+    @Column(name = "menu_id")
+    private Long menuId;
+
+    @Column(name = "menu_name")
+    private String menuName;
+
+    @Column(name = "vendor_id")
+    private Long vendorId;
+
+    @Column(name = "vendor_name")
+    private String vendorName;
+
     private Integer quantity;
+
+    @Column(name = "total_price")
     private Double totalPrice;
 
-    @ManyToOne
-    @JoinColumn(name = "menu_id")
-    private Menu menu;
+    @Column(nullable = false)
+    private String status = "Pending";
 
-    @ManyToOne
-    @JoinColumn(name = "vendor_id")
-    private Vendor vendor;
+    // -------- GETTERS & SETTERS --------
 
-    // Constructors
-    public Order() {}
-
-    public Order(Integer quantity, Double totalPrice, Menu menu, Vendor vendor) {
-        this.quantity = quantity;
-        this.totalPrice = totalPrice;
-        this.menu = menu;
-        this.vendor = vendor;
-    }
-
-    // Getters & Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
+    public Long getCustomerId() { return customerId; }
+    public void setCustomerId(Long customerId) { this.customerId = customerId; }
+
+    public String getCustomerName() { return customerName; }
+    public void setCustomerName(String customerName) { this.customerName = customerName; }
+
+    public Long getMenuId() { return menuId; }
+    public void setMenuId(Long menuId) { this.menuId = menuId; }
+
+    public String getMenuName() { return menuName; }
+    public void setMenuName(String menuName) { this.menuName = menuName; }
+
+    public Long getVendorId() { return vendorId; }
+    public void setVendorId(Long vendorId) { this.vendorId = vendorId; }
+
+    public String getVendorName() { return vendorName; }
+    public void setVendorName(String vendorName) { this.vendorName = vendorName; }
 
     public Integer getQuantity() { return quantity; }
     public void setQuantity(Integer quantity) { this.quantity = quantity; }
@@ -41,9 +65,6 @@ public class Order {
     public Double getTotalPrice() { return totalPrice; }
     public void setTotalPrice(Double totalPrice) { this.totalPrice = totalPrice; }
 
-    public Menu getMenu() { return menu; }
-    public void setMenu(Menu menu) { this.menu = menu; }
-
-    public Vendor getVendor() { return vendor; }
-    public void setVendor(Vendor vendor) { this.vendor = vendor; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }
