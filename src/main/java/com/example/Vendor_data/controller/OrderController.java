@@ -15,25 +15,25 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    // POST
+    // CREATE ORDER
     @PostMapping
     public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO dto) {
         return ResponseEntity.ok(orderService.createOrder(dto));
     }
 
-    // GET by ID
+    // GET ORDER BY ID
     @GetMapping("/{id}")
     public ResponseEntity<OrderDTO> getOrder(@PathVariable Long id) {
         return ResponseEntity.ok(orderService.getOrder(id));
     }
 
-    // GET all by customer
-    @GetMapping("/customer/{customerId}")
-    public ResponseEntity<List<OrderDTO>> getOrdersByCustomer(@PathVariable Long customerId) {
-        return ResponseEntity.ok(orderService.getOrdersByCustomerId(customerId));
+    // ✅ NEW : GET ALL ORDERS BY VENDOR ID
+    @GetMapping("/vendor/{vendorId}")
+    public ResponseEntity<List<OrderDTO>> getOrdersByVendor(@PathVariable Long vendorId) {
+        return ResponseEntity.ok(orderService.getOrdersByVendorId(vendorId));
     }
 
-    // PUT update
+    // UPDATE ORDER
     @PutMapping("/{id}")
     public ResponseEntity<OrderDTO> updateOrder(
             @PathVariable Long id,
@@ -42,7 +42,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.updateOrder(id, dto));
     }
 
-    // DELETE
+    // DELETE ORDER
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteOrder(@PathVariable Long id) {
         return ResponseEntity.ok(orderService.deleteOrder(id));

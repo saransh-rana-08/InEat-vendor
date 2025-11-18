@@ -21,7 +21,9 @@ public class OrderService {
     @Autowired
     private MenuRepository menuRepository;
 
-    // POST — create order
+    // =====================================================
+    // CREATE ORDER
+    // =====================================================
     public OrderDTO createOrder(OrderDTO dto) {
 
         Menu menu = menuRepository.findById(dto.getMenuId())
@@ -44,12 +46,14 @@ public class OrderService {
 
         dto.setId(saved.getId());
         dto.setTotalPrice(total);
-        dto.setStatus("Pending");
+        dto.setStatus(saved.getStatus());
 
         return dto;
     }
 
-    // GET single order
+    // =====================================================
+    // GET SINGLE ORDER
+    // =====================================================
     public OrderDTO getOrder(Long id) {
 
         Order order = orderRepository.findById(id)
@@ -70,15 +74,17 @@ public class OrderService {
         return dto;
     }
 
-    // GET all orders by customerId
-    public List<OrderDTO> getOrdersByCustomerId(Long customerId) {
+    // =====================================================
+    // GET ALL ORDERS BY VENDOR ID (NEW)
+    // =====================================================
+    public List<OrderDTO> getOrdersByVendorId(Long vendorId) {
 
-        List<Order> orders = orderRepository.findByCustomerId(customerId);
+        List<Order> orders = orderRepository.findByVendorId(vendorId);
         List<OrderDTO> list = new ArrayList<>();
 
         for (Order order : orders) {
-
             OrderDTO dto = new OrderDTO();
+
             dto.setId(order.getId());
             dto.setCustomerId(order.getCustomerId());
             dto.setCustomerName(order.getCustomerName());
@@ -96,7 +102,9 @@ public class OrderService {
         return list;
     }
 
-    // PUT — update order
+    // =====================================================
+    // UPDATE ORDER
+    // =====================================================
     public OrderDTO updateOrder(Long id, OrderDTO dto) {
 
         Order order = orderRepository.findById(id)
@@ -134,7 +142,9 @@ public class OrderService {
         return response;
     }
 
-    // DELETE
+    // =====================================================
+    // DELETE ORDER
+    // =====================================================
     public String deleteOrder(Long id) {
         if (!orderRepository.existsById(id)) {
             return "Order not found";
