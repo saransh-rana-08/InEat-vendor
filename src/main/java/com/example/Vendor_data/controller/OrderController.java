@@ -42,6 +42,15 @@ public class OrderController {
         return ResponseEntity.ok(orderService.updateOrder(id, dto));
     }
 
+    // ⭐ PARTIAL UPDATE ORDER (PATCH)
+    @PatchMapping("/{id}")
+    public ResponseEntity<OrderDTO> patchOrder(
+            @PathVariable Long id,
+            @RequestBody OrderDTO dto
+    ) {
+        return ResponseEntity.ok(orderService.patchOrder(id, dto));
+    }
+
     // DELETE ORDER
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteOrder(@PathVariable Long id) {

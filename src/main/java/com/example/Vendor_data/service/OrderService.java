@@ -142,6 +142,81 @@ public class OrderService {
         return response;
     }
 
+
+
+    // =====================================================
+// PARTIAL UPDATE (PATCH)
+// =====================================================
+    public OrderDTO patchOrder(Long id, OrderDTO dto) {
+
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        // Update ONLY non-null fields
+
+        if (dto.getCustomerId() != null)
+            order.setCustomerId(dto.getCustomerId());
+
+        if (dto.getCustomerName() != null)
+            order.setCustomerName(dto.getCustomerName());
+
+        if (dto.getMenuId() != null) {
+
+            Menu menu = menuRepository.findById(dto.getMenuId())
+                    .orElseThrow(() -> new RuntimeException("Menu not found"));
+
+            order.setMenuId(dto.getMenuId());
+            order.setMenuName(dto.getMenuName());
+
+            // Recalculate price only if quantity exists
+            if (order.getQuantity() != null)
+                order.setTotalPrice(menu.getPrice() * order.getQuantity());
+        }
+
+        if (dto.getMenuName() != null)
+            order.setMenuName(dto.getMenuName());
+
+        if (dto.getVendorId() != null)
+            order.setVendorId(dto.getVendorId());
+
+        if (dto.getVendorName() != null)
+            order.setVendorName(dto.getVendorName());
+
+        if (dto.getQuantity() != null) {
+            order.setQuantity(dto.getQuantity());
+
+            // Recalculate price using existing menu
+            Menu menu = menuRepository.findById(order.getMenuId())
+                    .orElseThrow(() -> new RuntimeException("Menu not found"));
+
+            order.setTotalPrice(menu.getPrice() * dto.getQuantity());
+        }
+
+        if (dto.getTotalPrice() != null)
+            order.setTotalPrice(dto.getTotalPrice());
+
+        if (dto.getStatus() != null)
+            order.setStatus(dto.getStatus());
+
+        Order saved = orderRepository.save(order);
+
+        // Build response DTO (same style as your other methods)
+        OrderDTO response = new OrderDTO();
+        response.setId(saved.getId());
+        response.setCustomerId(saved.getCustomerId());
+        response.setCustomerName(saved.getCustomerName());
+        response.setMenuId(saved.getMenuId());
+        response.setMenuName(saved.getMenuName());
+        response.setVendorId(saved.getVendorId());
+        response.setVendorName(saved.getVendorName());
+        response.setQuantity(saved.getQuantity());
+        response.setTotalPrice(saved.getTotalPrice());
+        response.setStatus(saved.getStatus());
+
+        return response;
+    }
+
+
     // =====================================================
     // DELETE ORDER
     // =====================================================
