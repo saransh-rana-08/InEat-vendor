@@ -242,6 +242,12 @@ public class OrderService {
 
         for (Order order : orders) {
 
+            // ⭐ STEP 3 — skip already completed orders
+            if ("Completed".equalsIgnoreCase(order.getStatus())) {
+                continue;
+            }
+
+            // Update non-null fields
             if (dto.getStatus() != null)
                 order.setStatus(dto.getStatus());
 
@@ -250,6 +256,7 @@ public class OrderService {
 
                 Menu menu = menuRepository.findById(order.getMenuId())
                         .orElseThrow(() -> new RuntimeException("Menu not found"));
+
                 order.setTotalPrice(menu.getPrice() * dto.getQuantity());
             }
 
@@ -264,6 +271,7 @@ public class OrderService {
 
             Order saved = orderRepository.save(order);
 
+            // Build DTO
             OrderDTO response = new OrderDTO();
             response.setId(saved.getId());
             response.setCustomerId(saved.getCustomerId());
@@ -281,6 +289,7 @@ public class OrderService {
 
         return result;
     }
+
 
 
 }
