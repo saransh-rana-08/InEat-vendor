@@ -227,4 +227,60 @@ public class OrderService {
         orderRepository.deleteById(id);
         return "Order deleted successfully";
     }
+
+    // =====================================================
+// PARTIAL UPDATE (PATCH) BY CUSTOMER ID
+// =====================================================
+    public List<OrderDTO> patchOrderByCustomerId(Long customerId, OrderDTO dto) {
+
+        List<Order> orders = orderRepository.findByCustomerId(customerId);
+        if (orders.isEmpty()) {
+            throw new RuntimeException("No orders found for customerId = " + customerId);
+        }
+
+        List<OrderDTO> result = new ArrayList<>();
+
+        for (Order order : orders) {
+
+            if (dto.getStatus() != null)
+                order.setStatus(dto.getStatus());
+
+            if (dto.getQuantity() != null) {
+                order.setQuantity(dto.getQuantity());
+
+                Menu menu = menuRepository.findById(order.getMenuId())
+                        .orElseThrow(() -> new RuntimeException("Menu not found"));
+                order.setTotalPrice(menu.getPrice() * dto.getQuantity());
+            }
+
+            if (dto.getVendorId() != null)
+                order.setVendorId(dto.getVendorId());
+
+            if (dto.getVendorName() != null)
+                order.setVendorName(dto.getVendorName());
+
+            if (dto.getMenuId() != null)
+                order.setMenuId(dto.getMenuId());
+
+            Order saved = orderRepository.save(order);
+
+            OrderDTO response = new OrderDTO();
+            response.setId(saved.getId());
+            response.setCustomerId(saved.getCustomerId());
+            response.setCustomerName(saved.getCustomerName());
+            response.setMenuId(saved.getMenuId());
+            response.setMenuName(saved.getMenuName());
+            response.setVendorId(saved.getVendorId());
+            response.setVendorName(saved.getVendorName());
+            response.setQuantity(saved.getQuantity());
+            response.setTotalPrice(saved.getTotalPrice());
+            response.setStatus(saved.getStatus());
+
+            result.add(response);
+        }
+
+        return result;
+    }
+
+
 }

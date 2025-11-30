@@ -56,4 +56,14 @@ public class OrderController {
     public ResponseEntity<String> deleteOrder(@PathVariable Long id) {
         return ResponseEntity.ok(orderService.deleteOrder(id));
     }
+
+    @PatchMapping("/customer/{customerId}")
+    public ResponseEntity<List<OrderDTO>> patchOrderByCustomer(
+            @PathVariable Long customerId,
+            @RequestBody OrderDTO dto
+    ) {
+        return ResponseEntity.ok(orderService.patchOrderByCustomerId(customerId, dto));
+    }
+
+
 }
