@@ -32,9 +32,14 @@ public class VendorService {
     // Update vendor
     public Vendor updateVendor(Long id, Vendor vendorDetails) {
         Vendor vendor = getVendorById(id);
+
         if (vendorDetails.getName() != null) vendor.setName(vendorDetails.getName());
         if (vendorDetails.getContactNumber() != null) vendor.setContactNumber(vendorDetails.getContactNumber());
         if (vendorDetails.getUniversity() != null) vendor.setUniversity(vendorDetails.getUniversity());
+
+        // 👉 Added image update (NEW)
+        if (vendorDetails.getImage() != null) vendor.setImage(vendorDetails.getImage());
+
         return vendorRepository.save(vendor);
     }
 

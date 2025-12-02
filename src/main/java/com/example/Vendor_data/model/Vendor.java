@@ -14,13 +14,17 @@ public class Vendor {
     private String contactNumber;
     private String university;
 
+    // ➕ New field added
+    private String image;
+
     // Constructors
     public Vendor() {}
 
-    public Vendor(String name, String contactNumber, String university) {
+    public Vendor(String name, String contactNumber, String university, String image) {
         this.name = name;
         this.contactNumber = contactNumber;
         this.university = university;
+        this.image = image;
     }
 
     // Getters & Setters
@@ -35,4 +39,8 @@ public class Vendor {
 
     public String getUniversity() { return university; }
     public void setUniversity(String university) { this.university = university; }
+
+    // ➕ Getter & Setter for image
+    public String getImage() { return image; }
+    public void setImage(String image) { this.image = image; }
 }
