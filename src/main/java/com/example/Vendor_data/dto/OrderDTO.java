@@ -5,7 +5,7 @@ import java.util.List;
 public class OrderDTO {
 
     private Long id;          // row id
-    private Long orderId;     // same for multiple items  <-- NEW
+    private Long orderId;     // same for multiple items
 
     private Long customerId;
     private String customerName;
@@ -21,7 +21,9 @@ public class OrderDTO {
 
     private String status;
 
-    // Multiple items in one order  <-- NEW
+    // Multiple items in one order:
+    // - For POST: frontend sends items[]
+    // - For GET (grouped by orderId): we fill this with child OrderDTOs
     private List<OrderDTO> items;
 
     // =============================
@@ -65,7 +67,7 @@ public class OrderDTO {
     public void setItems(List<OrderDTO> items) { this.items = items; }
 
     // =============================
-    // ⭐ PATCH HELPER
+    // PATCH HELPER
     // =============================
     public void merge(OrderDTO dto) {
         if (dto.getOrderId() != null) this.orderId = dto.getOrderId();
