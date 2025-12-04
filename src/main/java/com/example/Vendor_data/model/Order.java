@@ -8,7 +8,10 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id;   // item-level ID (unique for each row)
+
+    @Column(name = "order_id")
+    private Long orderId;  // SAME FOR multiple items of same order
 
     @Column(name = "customer_id")
     private Long customerId;
@@ -40,6 +43,9 @@ public class Order {
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
+    public Long getOrderId() { return orderId; }
+    public void setOrderId(Long orderId) { this.orderId = orderId; }
 
     public Long getCustomerId() { return customerId; }
     public void setCustomerId(Long customerId) { this.customerId = customerId; }

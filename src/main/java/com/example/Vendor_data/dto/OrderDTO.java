@@ -1,8 +1,11 @@
 package com.example.Vendor_data.dto;
 
+import java.util.List;
+
 public class OrderDTO {
 
-    private Long id;
+    private Long id;          // row id
+    private Long orderId;     // same for multiple items  <-- NEW
 
     private Long customerId;
     private String customerName;
@@ -18,12 +21,18 @@ public class OrderDTO {
 
     private String status;
 
+    // Multiple items in one order  <-- NEW
+    private List<OrderDTO> items;
+
     // =============================
     // GETTERS & SETTERS
     // =============================
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
+    public Long getOrderId() { return orderId; }
+    public void setOrderId(Long orderId) { this.orderId = orderId; }
 
     public Long getCustomerId() { return customerId; }
     public void setCustomerId(Long customerId) { this.customerId = customerId; }
@@ -52,11 +61,14 @@ public class OrderDTO {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
+    public List<OrderDTO> getItems() { return items; }
+    public void setItems(List<OrderDTO> items) { this.items = items; }
+
     // =============================
-    // ⭐ OPTIONAL: PATCH HELPER
+    // ⭐ PATCH HELPER
     // =============================
-    // This will merge only non-null fields from dto into this object
     public void merge(OrderDTO dto) {
+        if (dto.getOrderId() != null) this.orderId = dto.getOrderId();
         if (dto.getCustomerId() != null) this.customerId = dto.getCustomerId();
         if (dto.getCustomerName() != null) this.customerName = dto.getCustomerName();
         if (dto.getMenuId() != null) this.menuId = dto.getMenuId();

@@ -17,9 +17,10 @@ public class OrderController {
 
     // CREATE ORDER
     @PostMapping
-    public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO dto) {
+    public ResponseEntity<List<OrderDTO>> createOrder(@RequestBody OrderDTO dto) {
         return ResponseEntity.ok(orderService.createOrder(dto));
     }
+
 
     // GET ORDER BY ID
     @GetMapping("/{id}")
@@ -63,6 +64,13 @@ public class OrderController {
     public ResponseEntity<String> deleteOrder(@PathVariable Long id) {
         return ResponseEntity.ok(orderService.deleteOrder(id));
     }
+
+    // GET ALL ITEMS BY ORDER ID
+    @GetMapping("/order/{orderId}")
+    public ResponseEntity<List<OrderDTO>> getOrdersByOrderId(@PathVariable Long orderId) {
+        return ResponseEntity.ok(orderService.getOrdersByOrderId(orderId));
+    }
+
 
     @PatchMapping("/customer/{customerId}")
     public ResponseEntity<List<OrderDTO>> patchOrderByCustomer(
