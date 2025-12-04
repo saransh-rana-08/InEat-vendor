@@ -33,6 +33,13 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrdersByVendorId(vendorId));
     }
 
+    // GET ALL ORDERS BY CUSTOMER ID
+    @GetMapping("/customer/{customerId}")
+    public ResponseEntity<List<OrderDTO>> getOrdersByCustomer(@PathVariable Long customerId) {
+        return ResponseEntity.ok(orderService.getOrdersByCustomerId(customerId));
+    }
+
+
     // UPDATE ORDER
     @PutMapping("/{id}")
     public ResponseEntity<OrderDTO> updateOrder(

@@ -290,6 +290,36 @@ public class OrderService {
         return result;
     }
 
+    // =====================================================
+// GET ALL ORDERS BY CUSTOMER ID (NEW)
+// =====================================================
+    public List<OrderDTO> getOrdersByCustomerId(Long customerId) {
+
+        List<Order> orders = orderRepository.findByCustomerId(customerId);
+        List<OrderDTO> list = new ArrayList<>();
+
+        for (Order order : orders) {
+
+            OrderDTO dto = new OrderDTO();
+
+            dto.setId(order.getId());
+            dto.setCustomerId(order.getCustomerId());
+            dto.setCustomerName(order.getCustomerName());
+            dto.setMenuId(order.getMenuId());
+            dto.setMenuName(order.getMenuName());
+            dto.setVendorId(order.getVendorId());
+            dto.setVendorName(order.getVendorName());
+            dto.setQuantity(order.getQuantity());
+            dto.setTotalPrice(order.getTotalPrice());
+            dto.setStatus(order.getStatus());
+
+            list.add(dto);
+        }
+
+        return list;
+    }
+
+
 
 
 }
