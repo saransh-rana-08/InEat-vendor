@@ -9,8 +9,13 @@ public class MenuDTO {
     private String vendorName;
     private Long vendorId;
 
+    // ✅ NEW FIELDS
+    private String category;
+    private String description;
+
     public MenuDTO() {}
 
+    // Old constructor (untouched for backward compatibility)
     public MenuDTO(Long id, String itemName, Double price, Boolean available, String vendorName, Long vendorId) {
         this.id = id;
         this.itemName = itemName;
@@ -20,7 +25,15 @@ public class MenuDTO {
         this.vendorId = vendorId;
     }
 
-    // Getters and Setters
+    // ⭐ NEW OPTIONAL constructor including category & description
+    public MenuDTO(Long id, String itemName, Double price, Boolean available,
+                   String vendorName, Long vendorId, String category, String description) {
+        this(id, itemName, price, available, vendorName, vendorId);
+        this.category = category;
+        this.description = description;
+    }
+
+    // Getters & Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -40,4 +53,11 @@ public class MenuDTO {
 
     public Long getVendorId() { return vendorId; }
     public void setVendorId(Long vendorId) { this.vendorId = vendorId; }
+
+    // ✅ NEW Getters & Setters
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 }

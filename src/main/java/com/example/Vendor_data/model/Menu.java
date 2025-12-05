@@ -23,6 +23,10 @@ public class Menu {
 
     private Boolean available = true;
 
+    // ✅ NEW FIELDS
+    private String category;      // e.g. "Snacks", "Beverages", "Main Course"
+    private String description;   // item description
+
     @ManyToOne
     @JoinColumn(name = "vendor_id", insertable = false, updatable = false)
     private Vendor vendor;
@@ -30,7 +34,7 @@ public class Menu {
     // Constructors
     public Menu() {}
 
-    // Existing constructor (backward compatible)
+    // Existing constructor (unchanged)
     public Menu(String itemName, Double price, Vendor vendor) {
         this.itemName = itemName;
         this.price = price;
@@ -39,16 +43,19 @@ public class Menu {
             this.vendorId = vendor.getId();
             this.vendorName = vendor.getName();
         }
-        this.available = true; // Default true
+        this.available = true;
     }
 
-    // New constructor with all fields
-    public Menu(String itemName, Double price, Long vendorId, String vendorName, Boolean available) {
+    // New constructor (only extended, but old logic preserved)
+    public Menu(String itemName, Double price, Long vendorId, String vendorName, Boolean available,
+                String category, String description) {
         this.itemName = itemName;
         this.price = price;
         this.vendorId = vendorId;
         this.vendorName = vendorName;
         this.available = available != null ? available : true;
+        this.category = category;
+        this.description = description;
     }
 
     // Getters & Setters
@@ -71,6 +78,13 @@ public class Menu {
     public void setAvailable(Boolean available) {
         this.available = available != null ? available : true;
     }
+
+    // ✅ NEW GETTERS & SETTERS
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
     public Vendor getVendor() { return vendor; }
     public void setVendor(Vendor vendor) {

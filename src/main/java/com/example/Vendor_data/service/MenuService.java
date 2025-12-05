@@ -21,12 +21,12 @@ public class MenuService {
     @Autowired
     private VendorRepository vendorRepository;
 
-    // Get all menus for a specific vendor (returns entities) - EXISTING
+    // Get all menus for a specific vendor
     public List<Menu> getMenusByVendor(Long vendorId) {
         return menuRepository.findByVendorId(vendorId);
     }
 
-    // Get a specific menu by id and vendorId (returns entity) - EXISTING
+    // Get specific menu
     public Menu getMenuById(Long vendorId, Long menuId) {
         Optional<Menu> menu = menuRepository.findById(menuId);
         if (menu.isPresent() && menu.get().getVendorId().equals(vendorId)) {
@@ -36,23 +36,22 @@ public class MenuService {
         }
     }
 
-    // Create a new menu for a vendor (returns entity) - UPDATED
+    // Create menu for vendor
     public Menu createMenu(Long vendorId, Menu menu) {
         Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
 
-        // Set vendor details in the menu
         menu.setVendorId(vendorId);
         menu.setVendorName(vendor.getName());
         menu.setVendor(vendor);
 
-        // Always set available to true by default
+        // Default availability remains true
         menu.setAvailable(true);
 
         return menuRepository.save(menu);
     }
 
-    // Update a menu for a vendor (returns entity) - UPDATED
+    // Update menu
     public Menu updateMenu(Long vendorId, Long menuId, Menu menuDetails) {
         Menu menu = getMenuById(vendorId, menuId);
 
@@ -62,22 +61,30 @@ public class MenuService {
         if (menuDetails.getPrice() != null) {
             menu.setPrice(menuDetails.getPrice());
         }
-        // Don't update available from request, keep existing value
-        // Only update if explicitly provided in PATCH request
         if (menuDetails.getAvailable() != null) {
             menu.setAvailable(menuDetails.getAvailable());
+        }
+
+        // ✅ NEW — update category if sent
+        if (menuDetails.getCategory() != null) {
+            menu.setCategory(menuDetails.getCategory());
+        }
+
+        // ✅ NEW — update description if sent
+        if (menuDetails.getDescription() != null) {
+            menu.setDescription(menuDetails.getDescription());
         }
 
         return menuRepository.save(menu);
     }
 
-    // Delete a menu for a vendor - EXISTING
+    // Delete menu
     public void deleteMenu(Long vendorId, Long menuId) {
         Menu menu = getMenuById(vendorId, menuId);
         menuRepository.delete(menu);
     }
 
-    // Get all menus for a vendor as DTOs with vendor name and availability - UPDATED
+    // Get all menus as DTOs
     public List<MenuDTO> getMenuDTOsByVendor(Long vendorId) {
         List<Menu> menus = menuRepository.findByVendorId(vendorId);
         return menus.stream()
@@ -85,25 +92,25 @@ public class MenuService {
                 .collect(Collectors.toList());
     }
 
-    // Get specific menu as DTO with vendor name and availability - UPDATED
+    // Get specific menu as DTO
     public MenuDTO getMenuDTOById(Long vendorId, Long menuId) {
         Menu menu = getMenuById(vendorId, menuId);
         return convertToDTO(menu);
     }
 
-    // Create menu and return DTO with vendor name and availability - UPDATED
+    // Create menu DTO response
     public MenuDTO createMenuDTO(Long vendorId, Menu menu) {
         Menu savedMenu = createMenu(vendorId, menu);
         return convertToDTO(savedMenu);
     }
 
-    // Update menu and return DTO with vendor name and availability - UPDATED
+    // Update menu DTO response
     public MenuDTO updateMenuDTO(Long vendorId, Long menuId, Menu menuDetails) {
         Menu updatedMenu = updateMenu(vendorId, menuId, menuDetails);
         return convertToDTO(updatedMenu);
     }
 
-    // Helper method to convert Menu entity to MenuDTO - UPDATED
+    // Convert Menu entity to MenuDTO
     private MenuDTO convertToDTO(Menu menu) {
         MenuDTO dto = new MenuDTO();
         dto.setId(menu.getId());
@@ -112,6 +119,11 @@ public class MenuService {
         dto.setVendorId(menu.getVendorId());
         dto.setVendorName(menu.getVendorName());
         dto.setAvailable(menu.getAvailable());
+
+        // ✅ NEW — Add category & description to DTO
+        dto.setCategory(menu.getCategory());
+        dto.setDescription(menu.getDescription());
+
         return dto;
     }
 }
