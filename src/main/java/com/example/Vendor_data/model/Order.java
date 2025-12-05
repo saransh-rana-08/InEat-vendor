@@ -1,6 +1,7 @@
 package com.example.Vendor_data.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "orders")
@@ -8,10 +9,10 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;   // item-level ID (unique for each row)
+    private Long id;
 
     @Column(name = "order_id")
-    private Long orderId;  // SAME FOR multiple items of same order
+    private Long orderId;
 
     @Column(name = "customer_id")
     private Long customerId;
@@ -38,6 +39,10 @@ public class Order {
 
     @Column(nullable = false)
     private String status = "Pending";
+
+    // ⭐ NEW FIELD (date + time)
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     // -------- GETTERS & SETTERS --------
 
@@ -73,4 +78,7 @@ public class Order {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

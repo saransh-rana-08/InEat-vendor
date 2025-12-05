@@ -26,10 +26,8 @@ public class OrderService {
     // =====================================================
     public List<OrderDTO> createOrder(OrderDTO dto) {
 
-        // One orderId for all items
         Long generatedOrderId = System.currentTimeMillis();
 
-        // Frontend sends items[] in dto.items
         List<OrderDTO> items = dto.getItems() != null ? dto.getItems() : List.of(dto);
 
         for (OrderDTO item : items) {
@@ -58,12 +56,11 @@ public class OrderService {
             orderRepository.save(order);
         }
 
-        // Return grouped view for this orderId
         return getOrdersByOrderId(generatedOrderId);
     }
 
     // =====================================================
-    // GET ORDERS BY ORDER ID (GROUPED: orderId + items[])
+    // GET ORDERS BY ORDER ID — GROUPED VIEW
     // =====================================================
     public List<OrderDTO> getOrdersByOrderId(Long orderId) {
 
@@ -72,27 +69,52 @@ public class OrderService {
 
         Order first = orders.get(0);
 
-        // Parent DTO for this orderId
+// Parent DTO (NO menuId, menuName, quantity in parent)
         OrderDTO parent = new OrderDTO();
-        parent.setOrderId(orderId);
+        parent.setId(first.getId());          // ok
+        parent.setOrderId(orderId);           // shared order ID
+
         parent.setCustomerId(first.getCustomerId());
         parent.setCustomerName(first.getCustomerName());
+
         parent.setVendorId(first.getVendorId());
         parent.setVendorName(first.getVendorName());
-        parent.setStatus(first.getStatus());
 
-        // Child items list
+        parent.setStatus(first.getStatus());
+        parent.setCreatedAt(first.getCreatedAt().toString());
+
+// Total order price (sum of all item rows)
+        double totalSum = orders.stream()
+                .mapToDouble(Order::getTotalPrice)
+                .sum();
+
+        parent.setTotalPrice(totalSum);     // correct total amount
+
+
+        // Child item list
         List<OrderDTO> itemDtos = new ArrayList<>();
         for (Order o : orders) {
-            OrderDTO child = new OrderDTO();
-            child.setId(o.getId());
-            child.setMenuId(o.getMenuId());
-            child.setMenuName(o.getMenuName());
-            child.setQuantity(o.getQuantity());
-            child.setTotalPrice(o.getTotalPrice());
-            child.setStatus(o.getStatus());
-            itemDtos.add(child);
+            OrderDTO item = new OrderDTO();
+
+            item.setId(o.getId());
+            item.setOrderId(o.getOrderId());
+
+            // FIX: these fields were missing for child
+            item.setCustomerId(o.getCustomerId());
+            item.setCustomerName(o.getCustomerName());
+            item.setVendorId(o.getVendorId());
+            item.setVendorName(o.getVendorName());
+
+            item.setMenuId(o.getMenuId());
+            item.setMenuName(o.getMenuName());
+            item.setQuantity(o.getQuantity());
+            item.setTotalPrice(o.getTotalPrice());
+            item.setStatus(o.getStatus());
+            item.setCreatedAt(o.getCreatedAt().toString());
+
+            itemDtos.add(item);
         }
+
 
         parent.setItems(itemDtos);
 
@@ -100,7 +122,7 @@ public class OrderService {
     }
 
     // =====================================================
-    // GET SINGLE ROW BY ID (FLAT)
+    // GET SINGLE ORDER (FLAT)
     // =====================================================
     public OrderDTO getOrder(Long id) {
 
@@ -119,12 +141,13 @@ public class OrderService {
         dto.setQuantity(order.getQuantity());
         dto.setTotalPrice(order.getTotalPrice());
         dto.setStatus(order.getStatus());
+        dto.setCreatedAt(order.getCreatedAt().toString());
 
         return dto;
     }
 
     // =====================================================
-    // GET ALL ORDERS BY VENDOR ID (FLAT LIST)
+    // GET ALL ORDERS BY VENDOR ID (FLAT)
     // =====================================================
     public List<OrderDTO> getOrdersByVendorId(Long vendorId) {
 
@@ -145,6 +168,7 @@ public class OrderService {
             dto.setQuantity(order.getQuantity());
             dto.setTotalPrice(order.getTotalPrice());
             dto.setStatus(order.getStatus());
+            dto.setCreatedAt(order.getCreatedAt().toString());
 
             list.add(dto);
         }
@@ -153,7 +177,7 @@ public class OrderService {
     }
 
     // =====================================================
-    // UPDATE ORDER (SINGLE ROW)
+    // UPDATE ORDER
     // =====================================================
     public OrderDTO updateOrder(Long id, OrderDTO dto) {
 
@@ -189,58 +213,40 @@ public class OrderService {
         response.setQuantity(saved.getQuantity());
         response.setTotalPrice(saved.getTotalPrice());
         response.setStatus(saved.getStatus());
+        response.setCreatedAt(saved.getCreatedAt().toString());
 
         return response;
     }
 
     // =====================================================
-    // PATCH SINGLE ROW
+    // PATCH ORDER
     // =====================================================
     public OrderDTO patchOrder(Long id, OrderDTO dto) {
 
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        if (dto.getCustomerId() != null)
-            order.setCustomerId(dto.getCustomerId());
-
-        if (dto.getCustomerName() != null)
-            order.setCustomerName(dto.getCustomerName());
+        if (dto.getCustomerId() != null) order.setCustomerId(dto.getCustomerId());
+        if (dto.getCustomerName() != null) order.setCustomerName(dto.getCustomerName());
+        if (dto.getVendorId() != null) order.setVendorId(dto.getVendorId());
+        if (dto.getVendorName() != null) order.setVendorName(dto.getVendorName());
+        if (dto.getStatus() != null) order.setStatus(dto.getStatus());
 
         if (dto.getMenuId() != null) {
             Menu menu = menuRepository.findById(dto.getMenuId())
                     .orElseThrow(() -> new RuntimeException("Menu not found"));
-
             order.setMenuId(dto.getMenuId());
             order.setMenuName(dto.getMenuName());
-
             if (order.getQuantity() != null)
                 order.setTotalPrice(menu.getPrice() * order.getQuantity());
         }
 
-        if (dto.getMenuName() != null)
-            order.setMenuName(dto.getMenuName());
-
-        if (dto.getVendorId() != null)
-            order.setVendorId(dto.getVendorId());
-
-        if (dto.getVendorName() != null)
-            order.setVendorName(dto.getVendorName());
-
         if (dto.getQuantity() != null) {
             order.setQuantity(dto.getQuantity());
-
             Menu menu = menuRepository.findById(order.getMenuId())
                     .orElseThrow(() -> new RuntimeException("Menu not found"));
-
             order.setTotalPrice(menu.getPrice() * dto.getQuantity());
         }
-
-        if (dto.getTotalPrice() != null)
-            order.setTotalPrice(dto.getTotalPrice());
-
-        if (dto.getStatus() != null)
-            order.setStatus(dto.getStatus());
 
         Order saved = orderRepository.save(order);
 
@@ -256,24 +262,50 @@ public class OrderService {
         response.setQuantity(saved.getQuantity());
         response.setTotalPrice(saved.getTotalPrice());
         response.setStatus(saved.getStatus());
+        response.setCreatedAt(saved.getCreatedAt().toString());
 
         return response;
     }
 
     // =====================================================
-    // DELETE ORDER
+    // DELETE
     // =====================================================
     public String deleteOrder(Long id) {
-        if (!orderRepository.existsById(id)) {
-            return "Order not found";
-        }
+        if (!orderRepository.existsById(id)) return "Order not found";
         orderRepository.deleteById(id);
         return "Order deleted successfully";
     }
 
     // =====================================================
-    // PATCH BY CUSTOMER ID (MULTIPLE ROWS)
+    // GET ORDERS BY CUSTOMER ID
     // =====================================================
+    public List<OrderDTO> getOrdersByCustomerId(Long customerId) {
+
+        List<Order> orders = orderRepository.findByCustomerId(customerId);
+        List<OrderDTO> list = new ArrayList<>();
+
+        for (Order order : orders) {
+
+            OrderDTO dto = new OrderDTO();
+            dto.setId(order.getId());
+            dto.setOrderId(order.getOrderId());
+            dto.setCustomerId(order.getCustomerId());
+            dto.setCustomerName(order.getCustomerName());
+            dto.setMenuId(order.getMenuId());
+            dto.setMenuName(order.getMenuName());
+            dto.setVendorId(order.getVendorId());
+            dto.setVendorName(order.getVendorName());
+            dto.setQuantity(order.getQuantity());
+            dto.setTotalPrice(order.getTotalPrice());
+            dto.setStatus(order.getStatus());
+            dto.setCreatedAt(order.getCreatedAt().toString());
+
+            list.add(dto);
+        }
+
+        return list;
+    }
+
     public List<OrderDTO> patchOrderByCustomerId(Long customerId, OrderDTO dto) {
 
         List<Order> orders = orderRepository.findByCustomerId(customerId);
@@ -285,9 +317,8 @@ public class OrderService {
 
         for (Order order : orders) {
 
-            if ("Completed".equalsIgnoreCase(order.getStatus())) {
-                continue;
-            }
+            // Skip already completed orders
+            if ("Completed".equalsIgnoreCase(order.getStatus())) continue;
 
             if (dto.getStatus() != null)
                 order.setStatus(dto.getStatus());
@@ -324,6 +355,7 @@ public class OrderService {
             response.setQuantity(saved.getQuantity());
             response.setTotalPrice(saved.getTotalPrice());
             response.setStatus(saved.getStatus());
+            response.setCreatedAt(saved.getCreatedAt().toString()); // NEW
 
             result.add(response);
         }
@@ -331,32 +363,4 @@ public class OrderService {
         return result;
     }
 
-    // =====================================================
-    // GET ALL ORDERS BY CUSTOMER ID (FLAT)
-    // =====================================================
-    public List<OrderDTO> getOrdersByCustomerId(Long customerId) {
-
-        List<Order> orders = orderRepository.findByCustomerId(customerId);
-        List<OrderDTO> list = new ArrayList<>();
-
-        for (Order order : orders) {
-
-            OrderDTO dto = new OrderDTO();
-            dto.setId(order.getId());
-            dto.setOrderId(order.getOrderId());
-            dto.setCustomerId(order.getCustomerId());
-            dto.setCustomerName(order.getCustomerName());
-            dto.setMenuId(order.getMenuId());
-            dto.setMenuName(order.getMenuName());
-            dto.setVendorId(order.getVendorId());
-            dto.setVendorName(order.getVendorName());
-            dto.setQuantity(order.getQuantity());
-            dto.setTotalPrice(order.getTotalPrice());
-            dto.setStatus(order.getStatus());
-
-            list.add(dto);
-        }
-
-        return list;
-    }
 }

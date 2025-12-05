@@ -25,6 +25,8 @@ public class OrderDTO {
     // - For POST: frontend sends items[]
     // - For GET (grouped by orderId): we fill this with child OrderDTOs
     private List<OrderDTO> items;
+    private String createdAt; // NEW
+
 
     // =============================
     // GETTERS & SETTERS
@@ -65,6 +67,10 @@ public class OrderDTO {
 
     public List<OrderDTO> getItems() { return items; }
     public void setItems(List<OrderDTO> items) { this.items = items; }
+
+    public String getCreatedAt() { return createdAt; }
+    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+
 
     // =============================
     // PATCH HELPER
